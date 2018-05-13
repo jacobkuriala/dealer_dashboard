@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@material-ui/icons": "1.0.0-beta.42",
+    "auth0-js": "^9.5.1",
+    "auth0-lock": "^11.6.1",
     "chartist": "0.10.1",
     "history": "4.7.2",
     "material-ui": "1.0.0-beta.41",
