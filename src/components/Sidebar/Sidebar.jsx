@@ -15,6 +15,9 @@ import ListItemText from "material-ui/List/ListItemText";
 import Hidden from "material-ui/Hidden";
 import Collapse from "material-ui/transitions/Collapse";
 
+// @material-ui/icons
+import PowerSettingsNew from "@material-ui/icons/PowerSettingsNew";
+
 // core components
 import HeaderLinks from "components/Header/HeaderLinks.jsx";
 
@@ -64,7 +67,8 @@ class Sidebar extends React.Component {
       openTables: this.activeRoute("/tables"),
       openMaps: this.activeRoute("/maps"),
       openPages: this.activeRoute("-page"),
-      miniActive: true
+      miniActive: true,
+        userData: null
     };
     this.activeRoute.bind(this);
   }
@@ -76,6 +80,15 @@ class Sidebar extends React.Component {
     var st = {};
     st[collapse] = !this.state[collapse];
     this.setState(st);
+  }
+
+  logout(){
+      this.props.auth.logout();
+  }
+  componentDidMount(){
+      this.props.auth.getProfile((error,profile) => {
+          this.setState({'userData':profile});
+      });
   }
   render() {
     const {
@@ -131,10 +144,11 @@ class Sidebar extends React.Component {
       cx({
         [classes.photoRTL]: rtlActive
       });
-    var user = (
+
+    var user = this.state.userData ? (
       <div className={userWrapperClass}>
         <div className={photo}>
-          <img src={avatar} className={classes.avatarImg} alt="..." />
+          <img src={this.state.userData.picture} className={classes.avatarImg} alt="..." />
         </div>
         <List className={classes.list}>
           <ListItem className={classes.item + " " + classes.userItem}>
@@ -144,7 +158,7 @@ class Sidebar extends React.Component {
               onClick={() => this.openCollapse("openAvatar")}
             >
               <ListItemText
-                primary={rtlActive ? "تانيا أندرو" : "Tania Andrew"}
+                primary={this.state.userData.name}
                 secondary={
                   <b
                     className={
@@ -160,65 +174,30 @@ class Sidebar extends React.Component {
             </NavLink>
             <Collapse in={this.state.openAvatar} unmountOnExit>
               <List className={classes.list + " " + classes.collapseList}>
-                <ListItem className={classes.collapseItem}>
-                  <NavLink
-                    to="#"
-                    className={
-                      classes.itemLink + " " + classes.userCollapseLinks
-                    }
-                  >
+                  <ListItem className={classes.collapseItem}>
+                      <NavLink
+                          to="#"
+                          className={
+                              classes.itemLink + " " + classes.userCollapseLinks
+                          }
+                      >
                     <span className={collapseItemMini}>
-                      {rtlActive ? "مع" : "MP"}
+                      <PowerSettingsNew/>
                     </span>
-                    <ListItemText
-                      primary={rtlActive ? "ملفي" : "My Profile"}
-                      disableTypography={true}
-                      className={collapseItemText}
-                    />
-                  </NavLink>
-                </ListItem>
-                <ListItem className={classes.collapseItem}>
-                  <NavLink
-                    to="#"
-                    className={
-                      classes.itemLink + " " + classes.userCollapseLinks
-                    }
-                  >
-                    <span className={collapseItemMini}>
-                      {rtlActive ? "هوع" : "EP"}
-                    </span>
-                    <ListItemText
-                      primary={
-                        rtlActive ? "تعديل الملف الشخصي" : "Edit Profile"
-                      }
-                      disableTypography={true}
-                      className={collapseItemText}
-                    />
-                  </NavLink>
-                </ListItem>
-                <ListItem className={classes.collapseItem}>
-                  <NavLink
-                    to="#"
-                    className={
-                      classes.itemLink + " " + classes.userCollapseLinks
-                    }
-                  >
-                    <span className={collapseItemMini}>
-                      {rtlActive ? "و" : "S"}
-                    </span>
-                    <ListItemText
-                      primary={rtlActive ? "إعدادات" : "Settings"}
-                      disableTypography={true}
-                      className={collapseItemText}
-                    />
-                  </NavLink>
-                </ListItem>
+                          <ListItemText
+                              primary={"Logout"}
+                              disableTypography={true}
+                              className={collapseItemText}
+                              onClick={this.logout.bind(this)}
+                          />
+                      </NavLink>
+                  </ListItem>
               </List>
             </Collapse>
           </ListItem>
         </List>
       </div>
-    );
+    ):null;
     var links = (
       <List className={classes.list}>
         {routes.map((prop, key) => {
