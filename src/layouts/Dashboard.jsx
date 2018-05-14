@@ -14,36 +14,29 @@ import Header from "components/Header/Header.jsx";
 import Footer from "components/Footer/Footer.jsx";
 import Sidebar from "components/Sidebar/Sidebar.jsx";
 
-import dashboardRoutes from "routes/dashboard.jsx";
+import dashRoutesWrapper from "routes/dashboard.jsx";
 
 import appStyle from "assets/jss/material-dashboard-pro-react/layouts/dashboardStyle.jsx";
 
 import image from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/logo-white.svg";
 
-const switchRoutes = (
-  <Switch>
-    {dashboardRoutes.map((prop, key) => {
-      if (prop.redirect)
-        return <Redirect from={prop.path} to={prop.pathTo} key={key} />;
-      if (prop.collapse)
-        return prop.views.map((prop, key) => {
-          return (
-            <Route path={prop.path} component={prop.component} key={key} />
-          );
-        });
-      return <Route path={prop.path} component={prop.component} key={key} />;
-    })}
-  </Switch>
-);
+
 
 var ps;
 
 class Dashboard extends React.Component {
-  state = {
-    mobileOpen: false,
-    miniActive: false
-  };
+
+  constructor(props){
+    super(props);
+    this.dashboardRoutesWrapper = new dashRoutesWrapper(props.auth);
+    this.state = {
+        mobileOpen: false,
+        miniActive: false,
+        switchRoutes: null
+    };
+
+  }
   handleDrawerToggle = () => {
     this.setState({ mobileOpen: !this.state.mobileOpen });
   };
@@ -58,6 +51,29 @@ class Dashboard extends React.Component {
         suppressScrollY: false
       });
     }
+
+    // sent auth to children
+      if(this.props.auth){
+      this.dashboardRoutesWrapper = new dashRoutesWrapper(this.props.auth);
+          let switchRoutes = (
+              <Switch>
+                  {this.dashboardRoutesWrapper.dashRoutes.map((prop, key) => {
+                      if (prop.redirect)
+                          return <Redirect from={prop.path} to={prop.pathTo} key={key} />;
+                      if (prop.collapse)
+                          return prop.views.map((prop, key) => {
+                              return (
+                                  <Route path={prop.path} component={prop.component} key={key} render={prop.render} />
+                              );
+                          });
+                      return <Route path={prop.path} component={prop.component} key={key} render={prop.render}/>;
+                  })}
+              </Switch>
+          );
+          this.setState({
+              switchRoutes: switchRoutes
+          });
+      }
   }
   componentWillUnmount() {
     if (navigator.platform.indexOf("Win") > -1) {
@@ -83,9 +99,9 @@ class Dashboard extends React.Component {
           navigator.platform.indexOf("Win") > -1
       });
     return (
-      <div className={classes.wrapper}>
+        this.dashboardRoutesWrapper ? (<div className={classes.wrapper}>
         <Sidebar
-          routes={dashboardRoutes}
+          routes={this.dashboardRoutesWrapper.dashRoutes}
           logoText={"drive"}
           logo={logo}
           image={image}
@@ -100,21 +116,21 @@ class Dashboard extends React.Component {
           <Header
             sidebarMinimize={this.sidebarMinimize.bind(this)}
             miniActive={this.state.miniActive}
-            routes={dashboardRoutes}
+            routes={this.dashboardRoutesWrapper.dashRoutes}
             handleDrawerToggle={this.handleDrawerToggle}
             {...rest}
           />
           {/* On the /maps/full-screen-maps route we want the map to be on full screen - this is not possible if the content and conatiner classes are present because they have some paddings which would make the map smaller */}
           {this.getRoute() ? (
             <div className={classes.content}>
-              <div className={classes.container}>{switchRoutes}</div>
+              <div className={classes.container}>{this.state.switchRoutes}</div>
             </div>
           ) : (
-            <div className={classes.map}>{switchRoutes}</div>
+            <div className={classes.map}>{this.state.switchRoutes}</div>
           )}
           {this.getRoute() ? <Footer fluid /> : null}
         </div>
-      </div>
+      </div>):null
     );
   }
 }
