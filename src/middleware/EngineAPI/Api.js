@@ -21,16 +21,14 @@ export class EngineApi {
       });
   }
 
-  static getOrders(auth, dealerId, done) {
+  static getOrders(auth, dealerId, fromDate, toDate, done) {
     const { isAuthenticated, getAccessToken,  } = auth;
     const headers = isAuthenticated() ? { 'Authorization' : `Bearer ${getAccessToken()}`}: null;
-    console.log('called getOrders');
-    console.log('isAuthenticated ' + isAuthenticated());
     if(isAuthenticated()){
       console.log(getAccessToken());
     }
 
-    axios.get(`${EngineAPIUrl}/dealer_dashboard/orders/${dealerId}`, { headers })
+    axios.get(`${EngineAPIUrl}/dealer_dashboard/orders/${dealerId}?fromDate=${fromDate.toISOString()}&toDate=${toDate.toISOString()}`, { headers })
       .then(response => {
         console.log(response);
         done(null,response);
