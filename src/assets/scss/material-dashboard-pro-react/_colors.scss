@@ -32,20 +32,36 @@ $pink-A700: #c51162 !default;
 $pink: $pink-500 !default;
 
 
-$purple-50: #f3e5f5 !default;
-$purple-100: #e1bee7 !default;
-$purple-200: #ce93d8 !default;
-$purple-300: #ba68c8 !default;
-$purple-400: #ab47bc !default;
-$purple-500: #9c27b0 !default;
-$purple-600: #8e24aa !default;
-$purple-700: #7b1fa2 !default;
-$purple-800: #6a1b9a !default;
-$purple-900: #4a148c !default;
-$purple-A100: #ea80fc !default;
-$purple-A200: #e040fb !default;
-$purple-A400: #d500f9 !default;
-$purple-A700: #aa00ff !default;
+//$purple-50: #f3e5f5 !default;
+//$purple-100: #e1bee7 !default;
+//$purple-200: #ce93d8 !default;
+//$purple-300: #ba68c8 !default;
+//$purple-400: #0091EA !default; // changed
+//$purple-500: #0091EA !default;
+//$purple-600: #8e24aa !default;
+//$purple-700: #7b1fa2 !default;
+//$purple-800: #6a1b9a !default;
+//$purple-900: #4a148c !default;
+//$purple-A100: #ea80fc !default;
+//$purple-A200: #e040fb !default;
+//$purple-A400: #d500f9 !default;
+//$purple-A700: #aa00ff !default;
+//$purple: $purple-500 !default;
+
+$purple-50: #0091EA !default;
+$purple-100: #0091EA !default;
+$purple-200: #0091EA !default;
+$purple-300: #0091EA !default;
+$purple-400: #0091EA !default; // changed
+$purple-500: #0091EA !default;
+$purple-600: #0091EA !default;
+$purple-700: #0091EA !default;
+$purple-800: #0091EA !default;
+$purple-900: #0091EA !default;
+$purple-A100: #0091EA !default;
+$purple-A200: #0091EA !default;
+$purple-A400: #0091EA !default;
+$purple-A700: #0091EA !default;
 $purple: $purple-500 !default;
 
 
@@ -324,3 +340,5 @@ $blue-grey: $blue-grey-500 !default;
 
 $black: #000000; $rgb-black: "0,0,0" !default;
 $white: #ffffff; $rgb-white: "255,255,255" !default;
+
+$drive-blue: #0091EA !default;
