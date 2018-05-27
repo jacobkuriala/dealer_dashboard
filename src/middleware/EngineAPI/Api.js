@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { filter, find } from 'lodash';
+
 import { EngineAPIUrl } from './../Auth/auth0-variables';
 
 export class EngineApi {
@@ -22,21 +24,48 @@ export class EngineApi {
   }
 
   static getOrders(auth, dealerId, fromDate, toDate, done) {
-    const { isAuthenticated, getAccessToken,  } = auth;
-    const headers = isAuthenticated() ? { 'Authorization' : `Bearer ${getAccessToken()}`}: null;
-    if(isAuthenticated()){
-      console.log(getAccessToken());
-    }
+    const headers = EngineApi._populateAuthorizationHeader(auth);
 
-    axios.get(`${EngineAPIUrl}/dealer_dashboard/orders/${dealerId}?fromDate=${fromDate.toISOString()}&toDate=${toDate.toISOString()}`, { headers })
+    axios.get(
+        `${EngineAPIUrl}/dealer_dashboard/orders/${dealerId}?fromDate=${fromDate.toISOString()}&toDate=${toDate.toISOString()}`, { headers })
       .then(response => {
-        console.log(response);
         done(null,response);
       })
       .catch(error => {
         console.log(JSON.stringify(error));
         done(error,null);
       });
+  }
+
+    static getDealers(auth, dealerIds, done){
+        const headers = EngineApi._populateAuthorizationHeader(auth);
+
+        axios.get(`${EngineAPIUrl}/dealer_dashboard/dealers/`, { headers })
+            .then(response => {
+                response.data = filter(response.data, (d) => {
+                    let foundId = find(dealerIds, (id) =>{
+                        return id == d.id;
+                    });
+                    if (foundId){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+                done(null,response);
+            })
+            .catch(error => {
+                console.log(JSON.stringify(error));
+                done(error,null);
+            });
+    }
+
+  static _populateAuthorizationHeader(auth){
+      const { isAuthenticated, getAccessToken,  } = auth;
+      if(isAuthenticated()){
+          console.log(getAccessToken());
+      }
+      return isAuthenticated() ? { 'Authorization' : `Bearer ${getAccessToken()}`}: null;
   }
 }
 
