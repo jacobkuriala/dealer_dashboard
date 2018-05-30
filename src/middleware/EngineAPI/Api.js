@@ -37,6 +37,21 @@ export class EngineApi {
       });
   }
 
+    static getOrderDetails(auth, orderId, done) {
+        const headers = EngineApi._populateAuthorizationHeader(auth);
+
+        axios.get(
+            `${EngineAPIUrl}/dealer_dashboard/orderdetails/${orderId}`, { headers })
+            .then(response => {
+                console.log(response);
+                done(null,response);
+            })
+            .catch(error => {
+                console.log(JSON.stringify(error));
+                done(error,null);
+            });
+    }
+
     static getDealers(auth, dealerIds, done){
         const headers = EngineApi._populateAuthorizationHeader(auth);
 
