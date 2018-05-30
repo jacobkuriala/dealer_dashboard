@@ -201,7 +201,7 @@ class Sidebar extends React.Component {
     var links = (
       <List className={classes.list}>
         {routes.map((prop, key) => {
-          if (prop.redirect) {
+          if (prop.redirect || prop.hideFromSidebar) {
             return null;
           }
           if (prop.collapse) {

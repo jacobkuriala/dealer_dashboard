@@ -7,7 +7,8 @@ import ReactTables from "views/Tables/ReactTables.jsx";
 import UserProfile from "views/Pages/UserProfile.jsx";
 import TimelinePage from "views/Pages/Timeline.jsx";
 import RTLSupport from "views/Pages/RTLSupport.jsx";
-import Orders from "views/Orders/Orders.jsx";
+import Orders from "views/App/Orders/Orders.jsx";
+import OrderDetails from "views/App/Orders/OrderDetails.jsx";
 
 
 import pagesRoutes from "./pages.jsx";
@@ -54,6 +55,15 @@ class dashRoutesWrapper {
                 icon: Assignment,
                 render: ((props) => {
                     return (<Orders auth={auth} {...props} />)
+                })
+            },
+            {
+                path: "/orderdetails/:orderId",
+                name: "OrderDetails",
+                icon: Assignment,
+                hideFromSidebar: true,
+                render: ((props) => {
+                    return (<OrderDetails auth={auth} {...props} />)
                 })
             },
             {
