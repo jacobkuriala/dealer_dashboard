@@ -7,6 +7,8 @@ import Datetime from "react-datetime";
 import moment from "moment";
 import momentz from "moment-timezone";
 import { map, find } from 'lodash';
+import * as actionCreators from '../../../store/actions/actions';
+import { connect } from 'react-redux';
 
 // @material-ui/icons
 import Assignment from "@material-ui/icons/Assignment";
@@ -42,38 +44,25 @@ class Orders extends React.Component{
       let fromDateMoment = moment.tz(fromDate, DEALER_TIMEZONE);
       let toDateMoment = moment.tz(toDate, DEALER_TIMEZONE);
       this.state = {
-          dealerIds: null,
           fromDate: fromDateMoment,
           toDate: toDateMoment,
-          orders: null,
-          dealers: null,
-          selectedDealerId: ''
-      }
+          orders: null
+      };
+      this.props.setAuthorizedDealerIds(this.props.auth);
   }
 
-    componentDidMount(){
-        // get all order after getting dealer id
-        this.props.auth.getProfile((error,user)=> {
-            const dealerIds = user["http://localhost:3013/user_metadata"].dealerIds;
-            if(dealerIds){
-                this.setState({
-                    'dealerIds': user["http://localhost:3013/user_metadata"].dealerIds,
-                    'selectedDealerId': user["http://localhost:3013/user_metadata"].dealerIds[0]
-                }, () => {
-                    console.log('re retrieving data');
-                    this._retrieveDealers();
-                    this._retrieveOrders();
-                });
-
-            }
-        });
+    componentWillReceiveProps(nextProps){
+      if(this.props.dealerInfo.selectedDealerId !== nextProps.dealerInfo.selectedDealerId){
+          console.log("inside inside ComponentWillReceiveProps");
+          this._retrieveOrders(nextProps.dealerInfo.selectedDealerId);
+      }
     }
 
     onFromDateChanged(momentObj){
       this.setState({
           fromDate: momentObj
       },()=>{
-          this._retrieveOrders();
+          this._retrieveOrders(this.props.dealerInfo.selectedDealerId);
       });
     }
 
@@ -81,24 +70,21 @@ class Orders extends React.Component{
         this.setState({
             toDate: momentObj
         },()=>{
-            this._retrieveOrders();
+            this._retrieveOrders(this.props.dealerInfo.selectedDealerId);
         });
     }
 
     onGetOrdersClicked(){
-        this._retrieveOrders();
+        this._retrieveOrders(this.props.dealerInfo.selectedDealerId);
     }
 
     onDealerChanged(e){
-      this.setState({
-          'selectedDealerId': e.target.value
-      },()=>{
-          this._retrieveOrders();
-      });
+        this.props.setSelectedAuthorizedDealer(e.target.value);
     }
 
   render(){
       console.log('render called');
+      console.log(this.props.dealerInfo);
       const { classes } = this.props;
       let tableContent = this.state.orders ? (
           <ReactTable
@@ -215,7 +201,7 @@ class Orders extends React.Component{
                               classes={{
                                   select: classes.select
                               }}
-                              value={this.state.selectedDealerId}
+                              value={this.props.dealerInfo.selectedDealerId}
                               onChange={this.onDealerChanged.bind(this)}
                               inputProps={{
                                   name: "selectedDealerId",
@@ -285,7 +271,7 @@ class Orders extends React.Component{
 
   _createMenuItems(){
       const { classes } = this.props;
-        const menuItems = map(this.state.dealers, (d) =>{
+        const menuItems = map(this.props.dealerInfo.authorizedDealers, (d) =>{
             return (
                   <MenuItem
                       classes={{
@@ -300,17 +286,15 @@ class Orders extends React.Component{
                   </MenuItem>
             );
         });
-        console.log(this.state.dealers);
-        console.log(menuItems);
-        console.log(this);
         return menuItems;
   }
 
-  _retrieveOrders() {
+  _retrieveOrders(selectedDealerId) {
       // converting from dealer_timezone to utc
       const fromDateUTC = new Date(this.state.fromDate.tz('utc').format('YYYY-MM-DD HH:mm:ss'));
       const toDateUTC = new Date(this.state.toDate.tz('utc').format('YYYY-MM-DD HH:mm:ss'));
-      EngineApi.getOrders(this.props.auth, this.state.selectedDealerId, fromDateUTC, toDateUTC, (error, response) => {
+      EngineApi.getOrders(this.props.auth, selectedDealerId,
+          fromDateUTC, toDateUTC, (error, response) => {
           if (error) {
               this.setState({
                  'orders': []
@@ -324,29 +308,27 @@ class Orders extends React.Component{
       });
   }
 
-    _retrieveDealers() {
-        // converting from dealer_timezone to utc
-        EngineApi.getDealers(this.props.auth, this.state.dealerIds, (error, response) => {
-            if (error) {
-                this.setState({
-                    'dealers': []
-                });
-                return;
-                // throw error;
-            }
-
-            this.setState({
-                'dealers': response.data,
-            });
-        });
-    }
-
     _getSelectedDealer(){
-      let dealer = find(this.state.dealers, (d) => {
-          return d.id === this.state.selectedDealerId;
+      let dealer = find(this.props.dealerInfo.authorizedDealers, (d) => {
+          return d.id === this.props.dealerInfo.selectedDealerId;
       });
       return dealer;
     }
 }
 
-export default withStyles(extendedFormsStyle)(Orders);
+const mapStateToProps = (state) => {
+  return {
+      dealerInfo: state.dealerInfo
+  }
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+      setAuthorizedDealerIds : (auth) =>
+          dispatch(actionCreators.fetchAuthorizedDealerIds(auth)),
+      setSelectedAuthorizedDealer : (selectedDealerId) =>
+          dispatch(actionCreators.setSelectedAuthorizedDealerId(selectedDealerId))
+  }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(withStyles(extendedFormsStyle)(Orders));
