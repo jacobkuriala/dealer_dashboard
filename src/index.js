@@ -8,6 +8,7 @@ import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 
 // Reducers
 import dealerReducer from "./store/reducers/dealers";
+import orderReducer from "./store/reducers/orders";
 
 import indexRoutes from "routes/index.jsx";
 
@@ -16,7 +17,8 @@ import "assets/scss/material-dashboard-pro-react.css?v=1.1.0";
 const hist = createBrowserHistory();
 
 const combinedReducer = combineReducers({
-   dealerInfo: dealerReducer
+   dealerInfo: dealerReducer,
+    ordersInfo: orderReducer
 });
 
 const store = createStore(combinedReducer, compose(applyMiddleware(thunk)));

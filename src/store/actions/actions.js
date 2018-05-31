@@ -9,13 +9,6 @@ export const setAuthorization = (auth) => {
     }
 };
 
-export const setAuthorizedDealerIds = (authorizedDealerIds) => {
-    return {
-        type: actionTypes.SET_AUTHORIZED_DEALERIDS,
-            payload: authorizedDealerIds
-    }
-};
-
 export const setSelectedAuthorizedDealerId = (dealerId) => {
     return {
         type: actionTypes.SET_SELECTED_AUTHORIZED_DEALERID,
@@ -29,6 +22,7 @@ export const setAuthorizedDealers = (dealers) => {
         payload: dealers
     }
 }
+
 export const fetchAuthorizedDealers = (auth, dealerIds) => {
     return dispatch => {
         EngineApi.getDealers(auth, dealerIds, (error, response) => {
@@ -40,6 +34,13 @@ export const fetchAuthorizedDealers = (auth, dealerIds) => {
             dispatch(setAuthorizedDealers(response.data));
         });
     };
+};
+
+export const setAuthorizedDealerIds = (authorizedDealerIds) => {
+    return {
+        type: actionTypes.SET_AUTHORIZED_DEALERIDS,
+        payload: authorizedDealerIds
+    }
 };
 
 export const fetchAuthorizedDealerIds = (auth) => {
@@ -54,6 +55,42 @@ export const fetchAuthorizedDealerIds = (auth) => {
         });
     }
 };
+
+export const setOrdersList = (orders) => {
+    return {
+        type: actionTypes.SET_ORDER_LIST,
+        payload: orders
+    }
+};
+
+export const fetchOrdersList = (auth, dealerId, fromDateUTC, toDateUTC) => {
+    return dispatch => {
+        EngineApi.getOrders(auth, dealerId,
+            fromDateUTC, toDateUTC, (error, response) => {
+                if (error) {
+                    dispatch(setOrdersList([]));
+                    console.log(error);
+                    return;
+                }
+                dispatch(setOrdersList(response.data));
+            });
+    };
+};
+
+export const setOrdersListSelectedFromDate = (fromDate) =>{
+  return {
+      type: actionTypes.SET_ORDER_LIST_SELECTED_FROMDATE,
+      payload: fromDate
+  }
+};
+
+export const setOrdersListSelectedToDate = (toDate) =>{
+    return {
+        type: actionTypes.SET_ORDER_LIST_SELECTED_TODATE,
+        payload: toDate
+    }
+};
+
 
 
 
