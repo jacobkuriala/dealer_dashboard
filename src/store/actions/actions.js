@@ -2,6 +2,8 @@ import * as actionTypes from './actionTypes';
 import { EngineApi } from '../../middleware/EngineAPI/Api';
 
 
+// TODO: consider separating out actions based on reducers and reconcile using an index.js
+
 export const setAuthorization = (auth) => {
     return {
         type: actionTypes.SET_AUTHORIZATION,
@@ -75,6 +77,26 @@ export const fetchOrdersList = (auth, dealerId, fromDateUTC, toDateUTC) => {
                 dispatch(setOrdersList(response.data));
             });
     };
+};
+
+export const setSelectedOrderDetail = (orderDetail) => {
+    return {
+        type: actionTypes.SET_SELECTED_ORDER_DETAIL,
+        payload: orderDetail
+    }
+};
+
+export const fetchSelectedOrderDetail = (auth, selectedOrderId) => {
+    return dispatch => {
+        EngineApi.getOrderDetails(auth, selectedOrderId, (error, response)=>{
+            if(error){
+                dispatch(setSelectedOrderDetail({}));
+                console.log(error);
+                return;
+            }
+            dispatch(setSelectedOrderDetail(response.data))
+        });
+    }
 };
 
 export const setOrdersListSelectedFromDate = (fromDate) =>{

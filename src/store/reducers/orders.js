@@ -33,6 +33,11 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 ordersList_Selected_ToDate: action.payload
             };
+        case actionTypes.SET_SELECTED_ORDER_DETAIL:
+            return {
+                ...state,
+                orderDetail: action.payload
+            }
     }
     return state;
 };
