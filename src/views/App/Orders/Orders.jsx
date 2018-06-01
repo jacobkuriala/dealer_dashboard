@@ -24,7 +24,6 @@ import GridContainer from "components/Grid/GridContainer.jsx";
 import ItemGrid from "components/Grid/ItemGrid.jsx";
 import IconCard from "components/Cards/IconCard.jsx";
 
-import {EngineApi}  from '../../../middleware/EngineAPI/Api';
 import DateRange from "@material-ui/icons/DateRange";
 import DirectionsCar from "@material-ui/icons/DirectionsCar";
 import withStyles from "material-ui/styles/withStyles";
@@ -157,6 +156,12 @@ class Orders extends React.Component{
                   }
               ]}
               defaultPageSize={10}
+              defaultSorted={[
+                  {
+                      id: "id",
+                      desc: true
+                  }
+                  ]}
               showPaginationTop={false}
               showPaginationBottom={true}
               className="-striped -highlight"
