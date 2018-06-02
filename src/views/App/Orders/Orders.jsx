@@ -93,6 +93,7 @@ class Orders extends React.Component{
                       accessor: (c) =>{
                           return c.or.id;
                       },
+                      width:50
                   },
                   {
                       Header: "Name",
@@ -100,11 +101,13 @@ class Orders extends React.Component{
                       accessor: (c) =>{
                           return c.or.firstName + ' ' + c.or.lastName;
                       },
+                      width: 100
                   },
                   {
                       Header: "Email",
                       id: "email",
                       accessor: "or.email",
+                      width: 180
                   },
                   {
                       Header: "Phone",
@@ -121,7 +124,8 @@ class Orders extends React.Component{
                           // converted from utc to dealer_timezone
                           created = created.tz(DEALER_TIMEZONE);
                           return created.format("MMM DD YYYY, hh:mm a z");
-                      }
+                      },
+                      width: 180
                   },
                   {
                       Header:"Vehicle information",
@@ -131,7 +135,8 @@ class Orders extends React.Component{
                           // let orderMeta = JSON.parse(c.orme.json);
                           // console.log(orderMeta);
                           return vehicleString;
-                      }
+                      },
+                      width: 250
                   },
                   {
                       Header:"Finance",
