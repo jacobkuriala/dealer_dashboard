@@ -16,7 +16,6 @@ import MoreVert from "@material-ui/icons/MoreVert";
 import ViewList from "@material-ui/icons/ViewList";
 
 // core components
-import HeaderLinks from "./HeaderLinks";
 import CustomIconButton from "components/CustomButtons/IconButton.jsx";
 
 import headerStyle from "assets/jss/material-dashboard-pro-react/components/headerStyle.jsx";
@@ -36,7 +35,7 @@ function Header({ ...props }) {
       if (prop.path === props.location.pathname) {
         name = prop.name;
       }
-      return null;
+      return "";
     });
     return name;
   }
@@ -72,9 +71,6 @@ function Header({ ...props }) {
             {makeBrand()}
           </Button>
         </div>
-        <Hidden smDown implementation="css">
-          <HeaderLinks rtlActive={rtlActive} />
-        </Hidden>
         <Hidden mdUp>
           <IconButton
             className={classes.appResponsive}

@@ -50,7 +50,7 @@ class SidebarWrapper extends React.Component {
     return (
       <div className={className} ref="sidebarWrapper">
         {user}
-        {headerLinks}
+
         {links}
       </div>
     );
