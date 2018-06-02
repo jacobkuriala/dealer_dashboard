@@ -2213,8 +2213,8 @@ blockquote p {
   font-style: italic; }
 
 body, h1, h2, h3, h4, h5, h6 {
-  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-  font-weight: 300;
+  font-family: Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;
+  font-weight: 700;
   line-height: 1.5em; }
 
 a {

@@ -80,8 +80,8 @@ const card = {
 };
 
 const defaultFont = {
-  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-  fontWeight: "300",
+  fontFamily: 'Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif',
+  fontWeight: "700",
   lineHeight: "1.5em"
 };
 
