@@ -40,6 +40,7 @@ const headerStyle = theme => ({
   },
   title: {
     ...defaultFont,
+      paddingLeft:"5px",
     lineHeight: "30px",
     fontSize: "18px",
     borderRadius: "3px",

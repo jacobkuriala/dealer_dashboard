@@ -101,8 +101,14 @@ export default class Auth {
     let lock = new Auth0Lock(
       AUTH_CONFIG.clientId,
       AUTH_CONFIG.domain,{
+        languageDictionary:{
+          title: ""
+        },
         theme:{
-          logo: 'https://www.drivemotors.com/assets/logos/drive_logo_march_14.svg'
+          title: "Login",
+          logo: 'https://d3j9pdwk635p6l.cloudfront.net/H4mIgbXSQipbtrm6wlSg',
+            primaryColor: "#0091ea",
+            foregroundColor: "#000000"
         },
         allowSignUp: false,
         allowedConnections: ['Username-Password-Authentication'],
