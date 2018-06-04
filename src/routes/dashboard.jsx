@@ -66,33 +66,6 @@ class dashRoutesWrapper {
                     return (<OrderDetails auth={auth} {...props} />)
                 })
             },
-            {
-                collapse: true,
-                path: "/tables",
-                name: "Tables",
-                state: "openTables",
-                icon: GridOn,
-                views: [
-                    {
-                        path: "/tables/regular-tables",
-                        name: "Regular Tables",
-                        mini: "RT",
-                        component: RegularTables
-                    },
-                    {
-                        path: "/tables/extended-tables",
-                        name: "Extended Tables",
-                        mini: "ET",
-                        component: ExtendedTables
-                    },
-                    {
-                        path: "/tables/react-tables",
-                        name: "React Tables",
-                        mini: "RT",
-                        component: ReactTables
-                    }
-                ]
-            },
             { redirect: true, path: "/", pathTo: "/dashboard", name: "Dashboard" }
         ];
     }
