@@ -12,8 +12,6 @@ import Hidden from "material-ui/Hidden";
 
 // material-ui icons
 import Menu from "@material-ui/icons/Menu";
-import MoreVert from "@material-ui/icons/MoreVert";
-import ViewList from "@material-ui/icons/ViewList";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft"
 
 // core components
