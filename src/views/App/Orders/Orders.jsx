@@ -6,7 +6,7 @@ import ReactTable from "react-table";
 import Datetime from "react-datetime";
 import moment from "moment";
 import momentz from "moment-timezone";
-import { map, find } from 'lodash';
+import { map, find, capitalize } from 'lodash';
 import * as actionCreators from '../../../store/actions/actions';
 import { connect } from 'react-redux';
 
@@ -139,7 +139,7 @@ class Orders extends React.Component{
                       Header:"Finance",
                       id:"financetype",
                       accessor: (c) =>{
-                          return c.or.financeType;
+                          return capitalize(c.or.financeType);
                       }
                   },
                   {
