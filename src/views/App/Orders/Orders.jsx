@@ -147,7 +147,16 @@ class Orders extends React.Component{
                       id:"trade_in",
                       accessor: (c) =>{
                           return c.or.tradeInKbbVehicleId ? 'Yes': 'No';
-                      }
+                      },
+                      width: 80
+                  },
+                  {
+                      Header:"Add. Options",
+                      id:"options",
+                      accessor: (c) =>{
+                          return c.or.optionsCostCents > 0 ? 'Yes': 'No';
+                      },
+                      width: 80
                   },
                   {
                       Header:"Source",
