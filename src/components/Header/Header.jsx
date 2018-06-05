@@ -14,13 +14,20 @@ import Hidden from "material-ui/Hidden";
 import Menu from "@material-ui/icons/Menu";
 import MoreVert from "@material-ui/icons/MoreVert";
 import ViewList from "@material-ui/icons/ViewList";
+import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft"
 
 // core components
 import CustomIconButton from "components/CustomButtons/IconButton.jsx";
 
 import headerStyle from "assets/jss/material-dashboard-pro-react/components/headerStyle.jsx";
 
+import history from '../../history';
+
 function Header({ ...props }) {
+  function goBack(){
+    history.goBack();
+  }
+
   function makeBrand() {
     var name;
     props.routes.map((prop, key) => {
@@ -52,19 +59,11 @@ function Header({ ...props }) {
   return (
     <AppBar className={classes.appBar + appBarClasses}>
       <Toolbar className={classes.container}>
-        <Hidden smDown>
-          <div className={sidebarMinimize}>
-            {props.miniActive ? (
-              <CustomIconButton color="white" onClick={props.sidebarMinimize}>
-                <ViewList className={classes.sidebarMiniIcon} />
-              </CustomIconButton>
-            ) : (
-              <CustomIconButton color="white" onClick={props.sidebarMinimize}>
-                <MoreVert className={classes.sidebarMiniIcon} />
-              </CustomIconButton>
-            )}
-          </div>
-        </Hidden>
+        <div className={sidebarMinimize}>
+            <CustomIconButton color="white" onClick={goBack}>
+              <KeyboardArrowLeft className={classes.sidebarMiniIcon} />
+            </CustomIconButton>
+        </div>
         <div className={classes.flex}>
           {/* Here we create navbar brand, based on route name */}
           <Button href="#" className={classes.title}>
