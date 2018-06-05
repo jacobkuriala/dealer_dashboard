@@ -1,5 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
+
+import * as actionCreators from '../../store/actions/actions';
+import { connect } from 'react-redux';
 // javascript plugin used to create scrollbars on windows
 import PerfectScrollbar from "perfect-scrollbar";
 import { NavLink } from "react-router-dom";
@@ -15,6 +18,11 @@ import ListItemText from "material-ui/List/ListItemText";
 import Hidden from "material-ui/Hidden";
 import Collapse from "material-ui/transitions/Collapse";
 
+import FormControl from "material-ui/Form/FormControl";
+import InputLabel from "material-ui/Input/InputLabel";
+import Select from "material-ui/Select";
+import MenuItem from "material-ui/Menu/MenuItem";
+
 // @material-ui/icons
 import PowerSettingsNew from "@material-ui/icons/PowerSettingsNew";
 
@@ -24,6 +32,7 @@ import HeaderLinks from "components/Header/HeaderLinks.jsx";
 import sidebarStyle from "assets/jss/material-dashboard-pro-react/components/sidebarStyle.jsx";
 
 import avatar from "assets/img/faces/avatar.jpg";
+import {map} from "lodash";
 
 var ps;
 
@@ -70,6 +79,9 @@ class Sidebar extends React.Component {
       miniActive: true,
         userData: null
     };
+      if(!this.props.dealerInfo.selectedDealerId) {
+          this.props.setAuthorizedDealerIds(this.props.auth);
+      }
     this.activeRoute.bind(this);
   }
   // verifies if routeName is the one active (in browser input)
@@ -90,6 +102,11 @@ class Sidebar extends React.Component {
           this.setState({'userData':profile});
       });
   }
+
+    onDealerChanged(e){
+        this.props.setSelectedAuthorizedDealerId(e.target.value);
+    }
+
   render() {
     const {
       classes,
@@ -147,32 +164,41 @@ class Sidebar extends React.Component {
 
     var user = this.state.userData ? (
       <div className={userWrapperClass}>
-        <div className={photo}>
-          <img src={this.state.userData.picture} className={classes.avatarImg} alt="..." />
-        </div>
         <List className={classes.list}>
+            <ListItem className={classes.item + " " + classes.userItem}>
+
+                <FormControl
+                    fullWidth
+                    className={classes.selectFormControl}
+                >
+                    <Select
+                        MenuProps={{
+                            className: classes.selectMenu
+                        }}
+                        classes={{
+                            select: classes.select
+                        }}
+                        value={this.props.dealerInfo.selectedDealerId}
+                        onChange={this.onDealerChanged.bind(this)}
+                        inputProps={{
+                            name: "selectedDealerId",
+                            id: "dealer-select"
+                        }}
+                        style={{ color: '#ffffff'}}
+                    >
+                        <MenuItem
+                            disabled
+                            classes={{
+                                root: classes.selectMenuItem
+                            }}
+                        >
+                            Choose Dealer
+                        </MenuItem>
+                        {this._createMenuItems()}
+                    </Select>
+                </FormControl>
+            </ListItem>
           <ListItem className={classes.item + " " + classes.userItem}>
-            <NavLink
-              to={"#"}
-              className={classes.itemLink + " " + classes.userCollapseButton}
-              onClick={() => this.openCollapse("openAvatar")}
-            >
-              <ListItemText
-                primary={this.state.userData.name}
-                secondary={
-                  <b
-                    className={
-                      caret + " " + classes.userCaret +
-                      " " +
-                      (this.state.openAvatar ? classes.caretActive : "")
-                    }
-                  />
-                }
-                disableTypography={true}
-                className={itemText + " " + classes.userItemText}
-              />
-            </NavLink>
-            <Collapse in={this.state.openAvatar} unmountOnExit>
               <List className={classes.list + " " + classes.collapseList}>
                   <ListItem className={classes.collapseItem}>
                       <NavLink
@@ -193,7 +219,6 @@ class Sidebar extends React.Component {
                       </NavLink>
                   </ListItem>
               </List>
-            </Collapse>
           </ListItem>
         </List>
       </div>
@@ -453,6 +478,26 @@ class Sidebar extends React.Component {
       </div>
     );
   }
+
+    _createMenuItems(){
+        const { classes } = this.props;
+        const menuItems = map(this.props.dealerInfo.authorizedDealers, (d) =>{
+            return (
+                <MenuItem
+                    classes={{
+                        root: classes.selectMenuItem,
+                        selected: classes.selectMenuItemSelected
+                    }}
+                    value={d.id}
+                    key = {d.id}
+                    displayname = {d.name}
+                >
+                    {d.name}
+                </MenuItem>
+            );
+        });
+        return menuItems;
+    }
 }
 
 Sidebar.defaultProps = {
@@ -470,4 +515,19 @@ Sidebar.propTypes = {
   routes: PropTypes.arrayOf(PropTypes.object)
 };
 
-export default withStyles(sidebarStyle)(Sidebar);
+const mapStateToProps = (state) => {
+    return {
+        dealerInfo: state.dealerInfo
+    }
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setAuthorizedDealerIds : (auth) =>
+            dispatch(actionCreators.fetchAuthorizedDealerIds(auth)),
+        setSelectedAuthorizedDealerId : (selectedDealerId) =>
+            dispatch(actionCreators.setSelectedAuthorizedDealerId(selectedDealerId))
+    }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(withStyles(sidebarStyle)(Sidebar));

@@ -48,6 +48,12 @@ class Orders extends React.Component{
       }
     }
 
+    componentDidMount(){
+        this._retrieveOrders(this.props.dealerInfo.selectedDealerId,
+            this.props.ordersInfo.ordersList_Selected_FromDate,
+            this.props.ordersInfo.ordersList_Selected_ToDate);
+    }
+
     onFromDateChanged(momentObj){
         if(moment.isMoment(momentObj)){
             this.props.setOrdersListSelectedFromDate(momentObj);
