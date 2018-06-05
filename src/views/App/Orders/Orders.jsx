@@ -16,7 +16,6 @@ import Assignment from "@material-ui/icons/Assignment";
 // material-ui/components
 import FormControl from "material-ui/Form/FormControl";
 import InputLabel from "material-ui/Input/InputLabel";
-import Select from "material-ui/Select";
 import MenuItem from "material-ui/Menu/MenuItem";
 
 // core components
@@ -25,7 +24,6 @@ import ItemGrid from "components/Grid/ItemGrid.jsx";
 import IconCard from "components/Cards/IconCard.jsx";
 
 import DateRange from "@material-ui/icons/DateRange";
-import DirectionsCar from "@material-ui/icons/DirectionsCar";
 import withStyles from "material-ui/styles/withStyles";
 
 import extendedFormsStyle from "assets/jss/material-dashboard-pro-react/views/extendedFormsStyle.jsx";
@@ -35,9 +33,6 @@ const DEALER_TIMEZONE = 'America/Los_Angeles';
 class Orders extends React.Component{
   constructor(props) {
       super(props);
-      if(!this.props.dealerInfo.selectedDealerId) {
-          this.props.setAuthorizedDealerIds(this.props.auth);
-      }
   }
 
     componentWillReceiveProps(nextProps){
@@ -72,10 +67,6 @@ class Orders extends React.Component{
                 momentObj);
         }
 
-    }
-
-    onDealerChanged(e){
-        this.props.setSelectedAuthorizedDealerId(e.target.value);
     }
 
   render(){
@@ -182,51 +173,7 @@ class Orders extends React.Component{
       let title = dealer ? 'Orders for ' + dealer.name : 'Orders';
     return (
       <GridContainer>
-          <ItemGrid xs={12} sm={6} md={6} lg={6}>
-              <IconCard
-                  icon={DirectionsCar}
-                  title=""
-                  content={
-                      <FormControl
-                          fullWidth
-                          className={classes.selectFormControl}
-                      >
-                          <InputLabel
-                              htmlFor="simple-select"
-                              className={classes.selectLabel}
-                          >
-                              Choose Dealer
-                          </InputLabel>
-                          <Select
-                              MenuProps={{
-                                  className: classes.selectMenu
-                              }}
-                              classes={{
-                                  select: classes.select
-                              }}
-                              value={this.props.dealerInfo.selectedDealerId}
-                              onChange={this.onDealerChanged.bind(this)}
-                              inputProps={{
-                                  name: "selectedDealerId",
-                                  id: "dealer-select"
-                              }}
-                          >
-                              <MenuItem
-                                  disabled
-                                  classes={{
-                                      root: classes.selectMenuItem
-                                  }}
-                              >
-                                  Choose Dealer
-                              </MenuItem>
-                              {this._createMenuItems()}
-                          </Select>
-                      </FormControl>
-                  }
-              />
-
-          </ItemGrid>
-          <ItemGrid xs={12} sm={6} md={6} lg={6}>
+          <ItemGrid xs={12}>
               <IconCard
                   icon={DateRange}
                   title=""

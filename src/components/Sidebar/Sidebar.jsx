@@ -19,7 +19,6 @@ import Hidden from "material-ui/Hidden";
 import Collapse from "material-ui/transitions/Collapse";
 
 import FormControl from "material-ui/Form/FormControl";
-import InputLabel from "material-ui/Input/InputLabel";
 import Select from "material-ui/Select";
 import MenuItem from "material-ui/Menu/MenuItem";
 
