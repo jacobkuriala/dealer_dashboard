@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import * as actionCreators from '../../../store/actions/actions';
-import {forEach, toNumber, get, capitalize } from "lodash";
+import {forEach, toNumber, get, capitalize, isNil } from "lodash";
 import loading from '../../../middleware/Auth/Callback/loading.svg'
 // @material-ui/icons
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
@@ -52,20 +52,12 @@ class OrderDetails extends React.Component{
         const orderDetail = this.props.ordersInfo.orderDetail;
         let renderHtml = orderDetail && orderDetail.id === toNumber(this.props.match.params.orderId) ? (
             <GridContainer>
-                <ItemGrid xs={12} sm={6} md={6} lg={6}>
-                    <HeaderCard cardTitle='Customer Information' content={this._getCustomerInfoCard(orderDetail)} >
-                    </HeaderCard>
-                </ItemGrid>
-                <ItemGrid xs={12} sm={6} md={6} lg={6}>
-                    <HeaderCard cardTitle='Purchase Information' content={this._getOrderVehicleCard(orderDetail)} >
-                    </HeaderCard>
-                </ItemGrid>
-                <ItemGrid xs={12} sm={6} md={6} lg={6}>
-                    <HeaderCard cardTitle='Order Receipt' content={this._getOrderFinanceCard(orderDetail)} >
-                    </HeaderCard>
-                </ItemGrid>
+                {this._getCustomerInfoCard(orderDetail)}
+                {this._getOrderVehicleCard(orderDetail)}
+                {this._getOrderReceiptCard(orderDetail)}
                 {this._getUpgradesCard(orderDetail)}
                 {this._getTradeInCard(orderDetail)}
+                {this._getDeliveryCard(orderDetail)}
             </GridContainer>
         ) : (
             <GridContainer>
@@ -85,7 +77,7 @@ class OrderDetails extends React.Component{
     }
 
     _getCustomerInfoCard(orderDetail){
-        return (
+        const data = (
             <div>
                 <h4><small>Name: </small></h4>
                 <h4>{orderDetail.firstName} {orderDetail.lastName}</h4>
@@ -97,10 +89,11 @@ class OrderDetails extends React.Component{
                 </p>
             </div>
         );
+        return this._createCard('Customer Information', data);
     }
 
     _getOrderVehicleCard(orderDetail){
-        return (
+        const data = (
             <div>
                 <h4>{orderDetail.vehicle.style.year} {orderDetail.vehicle.make.name}
                     {orderDetail.vehicle.model.name} {orderDetail.vehicle.style.trim}</h4>
@@ -121,9 +114,10 @@ class OrderDetails extends React.Component{
                 </p>
             </div>
         );
+        return this._createCard('Purchase Information', data);
     }
 
-    _getOrderFinanceCard(orderDetail){
+    _getOrderReceiptCard(orderDetail){
         let title = "";
         switch(orderDetail.financeType.toLowerCase()){
             case "cash":
@@ -154,7 +148,7 @@ class OrderDetails extends React.Component{
                     </div>
                 )
         }
-        return (
+        const data = (
             <div>
                 {title}
                 {this._getRetailPriceLine(orderDetail)}
@@ -166,6 +160,7 @@ class OrderDetails extends React.Component{
                 {this._getTradeInTotalLine(orderDetail)}
             </div>
         );
+        return this._createCard('Order Receipt', data);
     }
 
     _getUpgradesCard(orderDetail){
@@ -177,12 +172,7 @@ class OrderDetails extends React.Component{
                     </div>
                 );
             });
-            return (
-                <ItemGrid xs={12} sm={6} md={6} lg={6}>
-                    <HeaderCard cardTitle='Upgrades' content={data} >
-                    </HeaderCard>
-                </ItemGrid>
-            )
+            return this._createCard('Upgrades', data);
         }else{
             return null;
         }
@@ -223,15 +213,46 @@ class OrderDetails extends React.Component{
                 </p>
             </div>);
 
-            return (
-                <ItemGrid xs={12} sm={6} md={6} lg={6}>
-                    <HeaderCard cardTitle='Trade in' content={data} >
-                    </HeaderCard>
-                </ItemGrid>
-            )
+            return this._createCard('Trade in', data);
         } else {
             return null;
         }
+    }
+
+    _getDeliveryCard(orderDetail){
+        const postOrder = get(orderDetail,'postOrder');
+        const deliveryType = get(postOrder, 'deliveryType');
+        const deliveryDate = get(postOrder, 'deliveryDate');
+        const deliveryTime = get(postOrder, 'deliveryTime');
+        const deliveryLabel = isNil(deliveryType)? 'Delivery/Pickup' : capitalize(deliveryType);
+        const deliveryAddress = get(postOrder, 'addressLine');
+        // deliveryType // deliveryDate // deliveryTime
+        const data = (
+            <div>
+                <h4>{capitalize(deliveryType)}</h4>
+                <p>
+                    <small>{deliveryLabel} Date:</small>    {deliveryDate && deliveryDate.split(' ')[0]}
+                </p>
+                <p>
+                    <small>{deliveryLabel} Time:</small>    {deliveryTime}
+                </p>
+                { deliveryType === 'DELIVERY' &&
+                <p>
+                    <small>Delivery Address</small>    {deliveryAddress}
+                </p>
+                }
+            </div>
+        );
+        return this._createCard('Pickup/Delivery', data);
+    }
+
+    _createCard(cardTitle, cardContent){
+        return (
+            <ItemGrid xs={12} sm={6} md={6} lg={6}>
+                <HeaderCard cardTitle={cardTitle} content={cardContent} >
+                </HeaderCard>
+            </ItemGrid>
+        );
     }
 
     _getRetailPriceLine(orderDetail){
