@@ -26,20 +26,13 @@ class OrderDetails extends React.Component{
 
     componentDidMount(){
         this._retrieveOrderDetails();
-        if(get(this,'props.orderInfo.orderDetail')){
-            this.props.setPageTitle(
-                capitalize(this.props.ordersInfo.orderDetail.firstName) +
-                " " + capitalize(this.props.ordersInfo.orderDetail.lastName));
-        }
     }
 
     componentDidUpdate(prevProps, preState){
-        if(get(this,'props.orderInfo.orderDetail.id') !==
-            get(prevProps,'ordersInfo.orderDetail.id')){
             this.props.setPageTitle(
                 capitalize(this.props.ordersInfo.orderDetail.firstName) +
                 " " + capitalize(this.props.ordersInfo.orderDetail.lastName));
-        }
+
     }
 
     render(){
@@ -71,6 +64,8 @@ class OrderDetails extends React.Component{
                     <HeaderCard cardTitle='Order Receipt' content={this._getOrderFinanceCard(orderDetail)} >
                     </HeaderCard>
                 </ItemGrid>
+                {this._getUpgradesCard(orderDetail)}
+                {this._getTradeInCard(orderDetail)}
             </GridContainer>
         ) : (
             <GridContainer>
@@ -171,6 +166,72 @@ class OrderDetails extends React.Component{
                 {this._getTradeInTotalLine(orderDetail)}
             </div>
         );
+    }
+
+    _getUpgradesCard(orderDetail){
+        if(orderDetail.optionsCostCents){
+            const data = orderDetail.options.map((option) => {
+                return (
+                    <div key={option.optionId}>
+                        {option.option.name}: {PriceFormat.defaultCents(option.priceCents)}
+                    </div>
+                );
+            });
+            return (
+                <ItemGrid xs={12} sm={6} md={6} lg={6}>
+                    <HeaderCard cardTitle='Upgrades' content={data} >
+                    </HeaderCard>
+                </ItemGrid>
+            )
+        }else{
+            return null;
+        }
+    }
+
+    _getTradeInCard(orderDetail){
+        const postOrder = get(orderDetail,'postOrder');
+        const tradeInVehicle = get(orderDetail, 'meta.kbbVehicle');
+        const tradeInDealerProvidedValue = !!get(orderDetail, 'tradeInDealerProvidedValue');
+        const tradeInAmountOwed = PriceFormat.defaultCents(orderDetail.tradeInOwedCents || 0);
+        const tradeVIN = get(postOrder, 'tradeVIN');
+
+        if(get(tradeInVehicle, 'id')){
+            const data = (<div>
+                <h4>{tradeInVehicle.year} {tradeInVehicle.make.value}
+                {tradeInVehicle.model.value} {tradeInVehicle.trim.value}</h4>
+                <p>
+                    <small>Condition:</small>    {capitalize(orderDetail.tradeInCondition)}
+                </p>
+                <p>
+                    <small>Mileage:</small>    {orderDetail.tradeInMileage}
+                </p>
+                <p>
+                    <small>Ownership:</small>    {orderDetail.tradeInOwnership}
+                </p>
+                <p>
+                    <small>{tradeInDealerProvidedValue? 'Trade value:' : 'Kelley Blue Book value:'}:</small>
+                    {PriceFormat.defaultCents((orderDetail.tradeInTotalCents || 0) + (orderDetail.tradeInOwedCents || 0))}
+                </p>
+                <p>
+                    <small>Amount owed:</small>    {tradeInAmountOwed}
+                </p>
+                <p>
+                    <small>Net value:</small>    {PriceFormat.defaultCents(orderDetail.tradeInTotalCents || 0)}
+                </p>
+                <p>
+                    <small>VIN:</small>    {tradeVIN}
+                </p>
+            </div>);
+
+            return (
+                <ItemGrid xs={12} sm={6} md={6} lg={6}>
+                    <HeaderCard cardTitle='Trade in' content={data} >
+                    </HeaderCard>
+                </ItemGrid>
+            )
+        } else {
+            return null;
+        }
     }
 
     _getRetailPriceLine(orderDetail){
