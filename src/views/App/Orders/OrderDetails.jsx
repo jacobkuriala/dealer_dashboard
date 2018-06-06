@@ -162,6 +162,13 @@ class OrderDetails extends React.Component{
         ): null;
 
         const kbbValue = (orderDetail.tradeInTotalCents || 0) + (orderDetail.tradeInOwedCents || 0);
+        const kbbOrTradeValueLine = ! (capitalize(orderDetail.tradeInOwnership) === 'Lease') ? (
+            <p>
+                <small>{tradeInDealerProvidedValue ? 'Trade value' : 'Kelley Blue Book value'}:</small>
+                {kbbValue > 0 && orderDetail.tradeInTotalCents ? PriceFormat.defaultCents(kbbValue): ' Dealer to confirm'}
+            </p>
+        ): null;
+
         if(get(tradeInVehicle, 'id')){
             const content = (<div>
                 <h4>{tradeInVehicle.year} {tradeInVehicle.make.value} {tradeInVehicle.model.value} {tradeInVehicle.trim.value}</h4>
@@ -174,10 +181,7 @@ class OrderDetails extends React.Component{
                 <p>
                     <small>Ownership:</small>    {capitalize(orderDetail.tradeInOwnership)}
                 </p>
-                <p>
-                    <small>{tradeInDealerProvidedValue ? 'Trade value' : 'Kelley Blue Book value'}:</small>
-                    {kbbValue > 0 && orderDetail.tradeInTotalCents ? PriceFormat.defaultCents(kbbValue): ' Dealer to confirm'}
-                </p>
+                {kbbOrTradeValueLine}
                 <p>
                     <small>Amount owed:</small>    {tradeInAmountOwed}
                 </p>
@@ -408,10 +412,12 @@ class OrderDetails extends React.Component{
         let absoluteTradeInCents = orderDetail.tradeInTotalCents < 0 ?
             '('+PriceFormat.defaultCents((-1 * orderDetail.tradeInTotalCents))+ ')' :
             PriceFormat.defaultCents(orderDetail.tradeInTotalCents || 0);
-            const kbbValue = (orderDetail.tradeInTotalCents || 0) + (orderDetail.tradeInOwedCents || 0);
+
                 return (
                     <p>
-                        <small>Trade In Net Value:</small>   {orderDetail.tradeInTotalCents && kbbValue ?
+                        <small>Trade in net value:</small>   {
+                        orderDetail.tradeInTotalCents ||
+                    capitalize(orderDetail.tradeInOwnership) === 'Lease' ?
                         absoluteTradeInCents: 'Dealer to confirm'}
                     </p>
                 )
