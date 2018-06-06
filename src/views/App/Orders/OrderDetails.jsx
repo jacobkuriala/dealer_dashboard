@@ -55,6 +55,7 @@ class OrderDetails extends React.Component{
                 {this._getCustomerInfoCard(orderDetail)}
                 {this._getOrderVehicleCard(orderDetail)}
                 {this._getOrderReceiptCard(orderDetail)}
+                {this._getOrderFinanceCard(orderDetail)}
                 {this._getUpgradesCard(orderDetail)}
                 {this._getTradeInCard(orderDetail)}
                 {this._getDeliveryCard(orderDetail)}
@@ -77,7 +78,7 @@ class OrderDetails extends React.Component{
     }
 
     _getCustomerInfoCard(orderDetail){
-        const data = (
+        const content = (
             <div>
                 <h4><small>Name: </small></h4>
                 <h4>{orderDetail.firstName} {orderDetail.lastName}</h4>
@@ -89,19 +90,18 @@ class OrderDetails extends React.Component{
                 </p>
             </div>
         );
-        return this._createCard('Customer Information', data);
+        return this._createCard('Customer', content);
     }
 
     _getOrderVehicleCard(orderDetail){
         const data = (
             <div>
-                <h4>{orderDetail.vehicle.style.year} {orderDetail.vehicle.make.name}
-                    {orderDetail.vehicle.model.name} {orderDetail.vehicle.style.trim}</h4>
+                <h4>{orderDetail.vehicle.style.year} {orderDetail.vehicle.make.name} {orderDetail.vehicle.model.name} {orderDetail.vehicle.style.trim}</h4>
                 <p>
                     <small>Vin:</small>    {orderDetail.vehicle.vin}
                 </p>
                 <p>
-                    <small>Stock #:</small>    {orderDetail.vehicle.vin}
+                    <small>Stock #:</small>    {orderDetail.vehicle.dealerStockCode}
                 </p>
                 <p>
                     <small>Exterior Color:</small>    {orderDetail.vehicle.exteriorColor.mfgrName}
@@ -114,43 +114,12 @@ class OrderDetails extends React.Component{
                 </p>
             </div>
         );
-        return this._createCard('Purchase Information', data);
+        return this._createCard('Purchase', data);
     }
 
     _getOrderReceiptCard(orderDetail){
-        let title = "";
-        switch(orderDetail.financeType.toLowerCase()){
-            case "cash":
-                title = (
-                    <h4>
-                        Full Cash Payment
-                    </h4>
-                );
-                break;
-            case "loan":
-                title = (
-                    <h4>
-                        Loan Request
-                    </h4>
-                );
-                break;
-            case "lease":
-                title = (
-                    <h4>
-                        Lease Request
-                    </h4>
-                );
-                break;
-            default:
-                return (
-                    <div>
-                        Sorry, Something went wrong here. No finance information
-                    </div>
-                )
-        }
-        const data = (
+        const content = (
             <div>
-                {title}
                 {this._getRetailPriceLine(orderDetail)}
                 {this._getDiscountLine(orderDetail)}
                 {this._getRebatesLine(orderDetail)}
@@ -160,19 +129,21 @@ class OrderDetails extends React.Component{
                 {this._getTradeInTotalLine(orderDetail)}
             </div>
         );
-        return this._createCard('Order Receipt', data);
+        return this._createCard('Order Receipt', content);
     }
 
     _getUpgradesCard(orderDetail){
         if(orderDetail.optionsCostCents){
-            const data = orderDetail.options.map((option) => {
+            const content = orderDetail.options.map((option) => {
                 return (
                     <div key={option.optionId}>
-                        {option.option.name}: {PriceFormat.defaultCents(option.priceCents)}
+                        <p>
+                            <small>{option.option.name}:</small> {PriceFormat.defaultCents(option.priceCents)}
+                        </p>
                     </div>
                 );
             });
-            return this._createCard('Upgrades', data);
+            return this._createCard('Upgrades', content);
         }else{
             return null;
         }
@@ -184,11 +155,16 @@ class OrderDetails extends React.Component{
         const tradeInDealerProvidedValue = !!get(orderDetail, 'tradeInDealerProvidedValue');
         const tradeInAmountOwed = PriceFormat.defaultCents(orderDetail.tradeInOwedCents || 0);
         const tradeVIN = get(postOrder, 'tradeVIN');
+        const tradeInVINLine = tradeVIN ? (
+            <p>
+                <small>VIN:</small>    {tradeVIN}
+            </p>
+        ): null;
 
+        const kbbValue = (orderDetail.tradeInTotalCents || 0) + (orderDetail.tradeInOwedCents || 0);
         if(get(tradeInVehicle, 'id')){
-            const data = (<div>
-                <h4>{tradeInVehicle.year} {tradeInVehicle.make.value}
-                {tradeInVehicle.model.value} {tradeInVehicle.trim.value}</h4>
+            const content = (<div>
+                <h4>{tradeInVehicle.year} {tradeInVehicle.make.value} {tradeInVehicle.model.value} {tradeInVehicle.trim.value}</h4>
                 <p>
                     <small>Condition:</small>    {capitalize(orderDetail.tradeInCondition)}
                 </p>
@@ -196,27 +172,122 @@ class OrderDetails extends React.Component{
                     <small>Mileage:</small>    {orderDetail.tradeInMileage}
                 </p>
                 <p>
-                    <small>Ownership:</small>    {orderDetail.tradeInOwnership}
+                    <small>Ownership:</small>    {capitalize(orderDetail.tradeInOwnership)}
                 </p>
                 <p>
-                    <small>{tradeInDealerProvidedValue? 'Trade value:' : 'Kelley Blue Book value:'}:</small>
-                    {PriceFormat.defaultCents((orderDetail.tradeInTotalCents || 0) + (orderDetail.tradeInOwedCents || 0))}
+                    <small>{tradeInDealerProvidedValue ? 'Trade value' : 'Kelley Blue Book value'}:</small>
+                    {kbbValue > 0 && orderDetail.tradeInTotalCents ? PriceFormat.defaultCents(kbbValue): ' Dealer to confirm'}
                 </p>
                 <p>
                     <small>Amount owed:</small>    {tradeInAmountOwed}
                 </p>
-                <p>
-                    <small>Net value:</small>    {PriceFormat.defaultCents(orderDetail.tradeInTotalCents || 0)}
-                </p>
-                <p>
-                    <small>VIN:</small>    {tradeVIN}
-                </p>
+                {this._getTradeInTotalLine(orderDetail)}
+                {tradeInVINLine}
             </div>);
 
-            return this._createCard('Trade in', data);
+            return this._createCard('Trade in', content);
         } else {
-            return null;
+            return this._createCard('Trade in',
+                (
+                <div>
+                    No Trade in Information
+                </div>
+                )
+            );
         }
+    }
+
+    _getOrderFinanceCard(orderDetail){
+        let pageTitle = 'Finance';
+        let content = '';
+        switch(orderDetail.financeType.toLowerCase()){
+            case "cash":
+                return this._createCard(pageTitle,(<h4>
+                    Full Cash Payment
+                </h4>));
+            case "loan":
+                const lenderRateValue = get(orderDetail, 'meta.rate.lenderRate');
+                const displayRateValue = get(orderDetail, 'meta.rate.rate');
+                content = (
+                    <div>
+                        <h4>
+                            Loan Request
+                        </h4>
+                        <p>
+                            <small>Down Payment:</small> {PriceFormat.defaultCents(orderDetail.downPaymentCents)}
+                        </p>
+                        <p>
+                            <small>Monthly Payment:</small> { orderDetail.monthlyTotalCents ?
+                            PriceFormat.defaultCents(orderDetail.monthlyTotalCents): 'Dealer to confirm'}
+                        </p>
+                        <p>
+                            <small>Term:</small> { orderDetail.term } months
+                        </p>
+                        <p>
+                            <small>Displayed Rate:</small>    {displayRateValue >= 0 ?
+                            displayRateValue + '%' : 'Dealer to confirm'}
+                        </p>
+                        <p>
+                            <small>Lender Rate:</small>    {lenderRateValue && lenderRateValue >= 0 ?
+                            lenderRateValue + '%' :
+                            'Dealer to confirm'}
+                        </p>
+                        <p>
+                            <small>Lender:</small> {get(orderDetail, 'meta.rate.lenderName') || 'Dealer to confirm'}
+                        </p>
+                        <p>
+                            <small>Order ID:</small> {get(orderDetail, 'id')}
+                        </p>
+                    </div>
+                );
+                break;
+            case "lease":
+                const lenderMoneyFactor = get(orderDetail,'meta.rate.bestTerm.SellRate');
+                content = (
+                    <div>
+                        <h4>
+                            Lease Request
+                        </h4>
+                        <p>
+                            <small>Down Payment:</small> {PriceFormat.defaultCents(orderDetail.downPaymentCents)}
+                        </p>
+                        <p>
+                            <small>Monthly Payment:</small> {orderDetail.monthlyTotalCents ?
+                            PriceFormat.defaultCents(orderDetail.monthlyTotalCents): 'Dealer to confirm'}
+                        </p>
+                        <p>
+                            <small>Term:</small> { orderDetail.term } months
+                        </p>
+                        <p>
+                            <small>Miles:</small> { orderDetail.mileage }
+                        </p>
+                        <p>
+                            <small>Displayed Money Factor:</small> { lenderMoneyFactor >= 0 ?
+                            lenderMoneyFactor :
+                            'Dealer to confirm'}
+                        </p>
+                        <p>
+                            <small>Lender Money Factor:</small> { lenderMoneyFactor >= 0 ?
+                            lenderMoneyFactor :
+                            'Dealer to confirm'}
+                        </p>
+                        <p>
+                            <small>Lender:</small> {get(orderDetail, 'meta.rate.lenderName') || 'Dealer to confirm'}
+                        </p>
+                        <p>
+                            <small>Order ID:</small> {get(orderDetail, 'id')}
+                        </p>
+                    </div>
+                );
+                break;
+            default:
+                return this._createCard(pageTitle,(
+                    <div>
+                        Sorry, Something went wrong here. No finance information
+                    </div>
+                ));
+        }
+        return this._createCard(pageTitle, content);
     }
 
     _getDeliveryCard(orderDetail){
@@ -227,7 +298,7 @@ class OrderDetails extends React.Component{
         const deliveryLabel = isNil(deliveryType)? 'Delivery/Pickup' : capitalize(deliveryType);
         const deliveryAddress = get(postOrder, 'addressLine');
         // deliveryType // deliveryDate // deliveryTime
-        const data = (
+        const content = !isNil(deliveryType) ? (
             <div>
                 <h4>{capitalize(deliveryType)}</h4>
                 <p>
@@ -238,12 +309,16 @@ class OrderDetails extends React.Component{
                 </p>
                 { deliveryType === 'DELIVERY' &&
                 <p>
-                    <small>Delivery Address</small>    {deliveryAddress}
+                    <small>Delivery Address:</small>    {deliveryAddress}
                 </p>
                 }
             </div>
+        ): (
+            <div>
+                No Pickup/Delivery Information
+            </div>
         );
-        return this._createCard('Pickup/Delivery', data);
+        return this._createCard('Pickup/Delivery', content);
     }
 
     _createCard(cardTitle, cardContent){
@@ -292,7 +367,7 @@ class OrderDetails extends React.Component{
         return orderDetail.optionsCostCents ?
             (
                 <p>
-                    <small>Upgrades:</small>   {PriceFormat.defaultCents(orderDetail.optionsCostCents)}
+                    <small>AddOns Total:</small>   {PriceFormat.defaultCents(orderDetail.optionsCostCents)}
                 </p>
             )
             :
@@ -330,25 +405,16 @@ class OrderDetails extends React.Component{
     }
 
     _getTradeInTotalLine(orderDetail){
-
-        if(orderDetail.tradeInTotalCents){
-            if(orderDetail.tradeInTotalCents > 0) {
+        let absoluteTradeInCents = orderDetail.tradeInTotalCents < 0 ?
+            '('+PriceFormat.defaultCents((-1 * orderDetail.tradeInTotalCents))+ ')' :
+            PriceFormat.defaultCents(orderDetail.tradeInTotalCents || 0);
+            const kbbValue = (orderDetail.tradeInTotalCents || 0) + (orderDetail.tradeInOwedCents || 0);
                 return (
                     <p>
-                        <small>Trade In:</small>   {PriceFormat.defaultCents(orderDetail.tradeInTotalCents)}
+                        <small>Trade In Net Value:</small>   {orderDetail.tradeInTotalCents && kbbValue ?
+                        absoluteTradeInCents: 'Dealer to confirm'}
                     </p>
                 )
-            } else {
-                let absoluteTradeInCents = -1 * orderDetail.tradeInTotalCents;
-                return (
-                    <p>
-                        <small>Trade In:</small>   ({PriceFormat.defaultCents(absoluteTradeInCents)})
-                    </p>
-                )
-            }
-        }else{
-            return null;
-        }
     }
 
     // kept cuz there seemed to be a bug in the optionsCostCents value
