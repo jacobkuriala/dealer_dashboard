@@ -1,3 +1,6 @@
+// Page level action types
+export const SET_PAGE_TITLE = "SET_PAGE_TITLE";
+
 // Dealer related action types
 export const SET_AUTHORIZATION = "SET_AUTHORIZATION";
 export const SET_AUTHORIZED_DEALERIDS = "SET_AUTHORIZED_DEALERIDS";

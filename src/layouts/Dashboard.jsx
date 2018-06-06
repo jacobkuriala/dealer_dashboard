@@ -1,4 +1,5 @@
 import React from "react";
+import {connect} from 'react-redux';
 import cx from "classnames";
 import PropTypes from "prop-types";
 import { Switch, Route, Redirect } from "react-router-dom";
@@ -20,6 +21,7 @@ import appStyle from "assets/jss/material-dashboard-pro-react/layouts/dashboardS
 
 import image from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/logo-white.svg";
+import * as actionCreators from "../store/actions/actions";
 
 
 
@@ -35,7 +37,6 @@ class Dashboard extends React.Component {
         miniActive: false,
         switchRoutes: null
     };
-
   }
   handleDrawerToggle = () => {
     this.setState({ mobileOpen: !this.state.mobileOpen });
@@ -51,7 +52,6 @@ class Dashboard extends React.Component {
         suppressScrollY: false
       });
     }
-
     // sent auth to children
       if(this.props.auth){
       this.dashboardRoutesWrapper = new dashRoutesWrapper(this.props.auth);

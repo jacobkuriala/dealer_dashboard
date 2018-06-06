@@ -9,6 +9,7 @@ import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 // Reducers
 import dealerReducer from "./store/reducers/dealers";
 import orderReducer from "./store/reducers/orders";
+import pageReducer from "./store/reducers/page";
 
 import indexRoutes from "routes/index.jsx";
 
@@ -18,7 +19,8 @@ const hist = createBrowserHistory();
 
 const combinedReducer = combineReducers({
    dealerInfo: dealerReducer,
-    ordersInfo: orderReducer
+    ordersInfo: orderReducer,
+    pageInfo: pageReducer
 });
 
 const store = createStore(combinedReducer, compose(applyMiddleware(thunk)));

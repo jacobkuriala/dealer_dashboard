@@ -6,7 +6,7 @@ import ReactTable from "react-table";
 import Datetime from "react-datetime";
 import moment from "moment";
 import momentz from "moment-timezone";
-import { map, find, capitalize } from 'lodash';
+import { map, find, capitalize, get } from 'lodash';
 import * as actionCreators from '../../../store/actions/actions';
 import { connect } from 'react-redux';
 
@@ -40,6 +40,12 @@ class Orders extends React.Component{
           this._retrieveOrders(nextProps.dealerInfo.selectedDealerId,
               this.props.ordersInfo.ordersList_Selected_FromDate,
               this.props.ordersInfo.ordersList_Selected_ToDate);
+      }
+    }
+
+    componentDidUpdate(prePorps, prevState){
+      if(get(this,'props.pageInfo.pageTitle') !== 'Orders'){
+          this.props.setPageTitle('Orders');
       }
     }
 
@@ -268,7 +274,8 @@ class Orders extends React.Component{
 const mapStateToProps = (state) => {
   return {
       dealerInfo: state.dealerInfo,
-      ordersInfo: state.ordersInfo
+      ordersInfo: state.ordersInfo,
+      pageInfo: state.pageInfo
   }
 };
 
@@ -283,7 +290,9 @@ const mapDispatchToProps = (dispatch) => {
       setOrdersListSelectedFromDate: (fromDate) =>
           dispatch(actionCreators.setOrdersListSelectedFromDate(fromDate)),
       setOrdersListSelectedToDate: (toDate) =>
-          dispatch(actionCreators.setOrdersListSelectedToDate(toDate))
+          dispatch(actionCreators.setOrdersListSelectedToDate(toDate)),
+      setPageTitle: (title) =>
+          dispatch(actionCreators.setPageTitle(title))
   }
 };
 

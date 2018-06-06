@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import cx from "classnames";
 
@@ -21,66 +22,54 @@ import headerStyle from "assets/jss/material-dashboard-pro-react/components/head
 
 import history from '../../history';
 
-function Header({ ...props }) {
-  function goBack(){
-    history.goBack();
-  }
+class Header extends React.Component {
+    constructor(props) {
+        super(props);
+    }
 
-  function makeBrand() {
-    var name;
-    props.routes.map((prop, key) => {
-      if (prop.collapse) {
-        prop.views.map((prop, key) => {
-          if (prop.path === props.location.pathname) {
-            name = prop.name;
-          }
-          return null;
+    goBack() {
+        history.goBack();
+    }
+
+    render() {
+        const {classes, color, rtlActive} = this.props;
+        const appBarClasses = cx({
+            [" " + classes[color]]: color
         });
-      }
-      if (prop.path === props.location.pathname) {
-        name = prop.name;
-      }
-      return "";
-    });
-    return name;
-  }
-  const { classes, color, rtlActive } = props;
-  const appBarClasses = cx({
-    [" " + classes[color]]: color
-  });
-  const sidebarMinimize =
-    classes.sidebarMinimize +
-    " " +
-    cx({
-      [classes.sidebarMinimizeRTL]: rtlActive
-    });
-  return (
-    <AppBar className={classes.appBar + appBarClasses}>
-      <Toolbar className={classes.container}>
-        <div className={sidebarMinimize}>
-            <CustomIconButton color="white" onClick={goBack}>
-              <KeyboardArrowLeft className={classes.sidebarMiniIcon} />
-            </CustomIconButton>
-        </div>
-        <div className={classes.flex}>
-          {/* Here we create navbar brand, based on route name */}
-          <Button href="#" className={classes.title}>
-            {makeBrand()}
-          </Button>
-        </div>
-        <Hidden mdUp>
-          <IconButton
-            className={classes.appResponsive}
-            color="inherit"
-            aria-label="open drawer"
-            onClick={props.handleDrawerToggle}
-          >
-            <Menu />
-          </IconButton>
-        </Hidden>
-      </Toolbar>
-    </AppBar>
-  );
+        const sidebarMinimize =
+            classes.sidebarMinimize +
+            " " +
+            cx({
+                [classes.sidebarMinimizeRTL]: rtlActive
+            });
+        return (
+            <AppBar className={classes.appBar + appBarClasses}>
+                <Toolbar className={classes.container}>
+                    <div className={sidebarMinimize}>
+                        <CustomIconButton color="white" onClick={this.goBack}>
+                            <KeyboardArrowLeft className={classes.sidebarMiniIcon}/>
+                        </CustomIconButton>
+                    </div>
+                    <div className={classes.flex}>
+                        {/* Here we create navbar brand, based on route name */}
+                        <Button href="#" className={classes.title}>
+                            {this.props.pageInfo.pageTitle}
+                        </Button>
+                    </div>
+                    <Hidden mdUp>
+                        <IconButton
+                            className={classes.appResponsive}
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={this.props.handleDrawerToggle}
+                        >
+                            <Menu/>
+                        </IconButton>
+                    </Hidden>
+                </Toolbar>
+            </AppBar>
+        );
+    }
 }
 
 Header.propTypes = {
@@ -89,4 +78,10 @@ Header.propTypes = {
   rtlActive: PropTypes.bool
 };
 
-export default withStyles(headerStyle)(Header);
+const mapStateToProps = (state) => {
+  return {
+    pageInfo : state.pageInfo
+  }
+};
+
+export default connect(mapStateToProps,null)(withStyles(headerStyle)(Header));

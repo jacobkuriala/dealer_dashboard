@@ -113,6 +113,14 @@ export const setOrdersListSelectedToDate = (toDate) =>{
     }
 };
 
+// Page actions
+export const setPageTitle = (title) => {
+    return {
+        type: actionTypes.SET_PAGE_TITLE,
+        payload: title
+    }
+};
+
 
 
 

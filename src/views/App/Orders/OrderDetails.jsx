@@ -1,8 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 import * as actionCreators from '../../../store/actions/actions';
-import {forEach } from "lodash";
-
+import {forEach, toNumber, get, capitalize } from "lodash";
+import loading from '../../../middleware/Auth/Callback/loading.svg'
 // @material-ui/icons
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 
@@ -21,37 +21,63 @@ import PriceFormat from '../../../common/priceFormat'
 class OrderDetails extends React.Component{
     constructor(props){
         super(props);
+
     }
 
     componentDidMount(){
         this._retrieveOrderDetails();
+        if(get(this,'props.orderInfo.orderDetail')){
+            this.props.setPageTitle(
+                capitalize(this.props.ordersInfo.orderDetail.firstName) +
+                " " + capitalize(this.props.ordersInfo.orderDetail.lastName));
+        }
+    }
+
+    componentDidUpdate(prevProps, preState){
+        if(get(this,'props.orderInfo.orderDetail.id') !==
+            get(prevProps,'ordersInfo.orderDetail.id')){
+            this.props.setPageTitle(
+                capitalize(this.props.ordersInfo.orderDetail.firstName) +
+                " " + capitalize(this.props.ordersInfo.orderDetail.lastName));
+        }
     }
 
     render(){
+        const style = {
+            position: 'absolute',
+            display: 'flex',
+            justifyContent: 'center',
+            height: '100vh',
+            width: '100vw',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'white',
+        };
         console.log(this.props.ordersInfo.orderDetail);
         const orderDetail = this.props.ordersInfo.orderDetail;
-        let renderHtml = orderDetail ? (
+        let renderHtml = orderDetail && orderDetail.id === toNumber(this.props.match.params.orderId) ? (
             <GridContainer>
                 <ItemGrid xs={12} sm={6} md={6} lg={6}>
-                    <HeaderCard cardTitle='Customer Information' content={this._getCustomerInformation(orderDetail)} >
+                    <HeaderCard cardTitle='Customer Information' content={this._getCustomerInfoCard(orderDetail)} >
                     </HeaderCard>
                 </ItemGrid>
                 <ItemGrid xs={12} sm={6} md={6} lg={6}>
-                    <HeaderCard cardTitle='Order Information' content={this._getOrderVehicleInformation(orderDetail)} >
+                    <HeaderCard cardTitle='Purchase Information' content={this._getOrderVehicleCard(orderDetail)} >
                     </HeaderCard>
                 </ItemGrid>
                 <ItemGrid xs={12} sm={6} md={6} lg={6}>
-                    <HeaderCard cardTitle='Finance Information' content={this._getOrderFinanceInformation(orderDetail)} >
+                    <HeaderCard cardTitle='Order Receipt' content={this._getOrderFinanceCard(orderDetail)} >
                     </HeaderCard>
                 </ItemGrid>
             </GridContainer>
         ) : (
             <GridContainer>
                 <ItemGrid xs={12}>
-                    <IconCard
-                        icon={ErrorOutline}
-                        content='No order information' >
-                    </IconCard>
+                    <div style={style}>
+                        <img src={loading} alt="loading"/>
+                    </div>
                 </ItemGrid>
             </GridContainer>
         );
@@ -63,7 +89,7 @@ class OrderDetails extends React.Component{
         this.props.setSelectedOrderDetail(this.props.auth, this.props.match.params.orderId);
     }
 
-    _getCustomerInformation(orderDetail){
+    _getCustomerInfoCard(orderDetail){
         return (
             <div>
                 <h4><small>Name: </small></h4>
@@ -78,7 +104,7 @@ class OrderDetails extends React.Component{
         );
     }
 
-    _getOrderVehicleInformation(orderDetail){
+    _getOrderVehicleCard(orderDetail){
         return (
             <div>
                 <h4>{orderDetail.vehicle.style.year} {orderDetail.vehicle.make.name}
@@ -102,7 +128,7 @@ class OrderDetails extends React.Component{
         );
     }
 
-    _getOrderFinanceInformation(orderDetail){
+    _getOrderFinanceCard(orderDetail){
         let title = "";
         switch(orderDetail.financeType.toLowerCase()){
             case "cash":
@@ -265,7 +291,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         setSelectedOrderDetail : (auth, selectedOrderId) =>
-            dispatch(actionCreators.fetchSelectedOrderDetail(auth, selectedOrderId))
+            dispatch(actionCreators.fetchSelectedOrderDetail(auth, selectedOrderId)),
+        setPageTitle: (title) =>
+            dispatch(actionCreators.setPageTitle(title))
     }
 };
 

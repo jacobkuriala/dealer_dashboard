@@ -1,5 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
+import {connect} from 'react-redux';
+import{ get } from 'lodash';
 // react plugin for creating charts
 import ChartistGraph from "react-chartist";
 // react plugin for creating vector maps
@@ -46,6 +48,7 @@ import dashboardStyle from "assets/jss/material-dashboard-pro-react/views/dashbo
 import priceImage1 from "assets/img/card-2.jpeg";
 import priceImage2 from "assets/img/card-3.jpeg";
 import priceImage3 from "assets/img/card-1.jpeg";
+import * as actionCreators from "../../store/actions/actions";
 
 const us_flag = require("assets/img/flags/US.png");
 const de_flag = require("assets/img/flags/DE.png");
@@ -492,10 +495,36 @@ class Dashboard extends React.Component {
       </div>
     );
   }
+
+  componentDidUpdate(prevProps, prevState){
+      this._setPageTitle('Dashboard');
+  }
+
+  componentDidMount(){
+    this._setPageTitle("Dashboard");
+  }
+  _setPageTitle(title){
+      if(get(this,'props.pageInfo.pageTitle','') !== title){
+          this.props.setPageTitle(title);
+      }
+  }
 }
 
 Dashboard.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(dashboardStyle)(Dashboard);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setPageTitle: (title) =>
+            dispatch(actionCreators.setPageTitle(title))
+    }
+};
+
+const mapStateToProps = (state) => {
+    return {
+        pageInfo: state.pageInfo
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(dashboardStyle)(Dashboard));
