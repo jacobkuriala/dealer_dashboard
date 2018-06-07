@@ -22,13 +22,30 @@ import headerStyle from "assets/jss/material-dashboard-pro-react/components/head
 
 import history from '../../history';
 
+import Fade from 'material-ui/transitions/Fade';
 class Header extends React.Component {
+    state = {
+        titleChanged:false
+    };
+
     constructor(props) {
         super(props);
     }
 
     goBack() {
         history.goBack();
+    }
+
+    componentDidUpdate(prevProps, prevState){
+        if(prevProps.pageInfo.pageTitle !== this.props.pageInfo.pageTitle){
+            this.setState({
+                titleChanged: false
+            },() =>{
+              this.setState({
+                  titleChanged: true
+              });
+            });
+        }
     }
 
     render() {
@@ -51,10 +68,11 @@ class Header extends React.Component {
                         </CustomIconButton>
                     </div>
                     <div className={classes.flex}>
-                        {/* Here we create navbar brand, based on route name */}
-                        <Button href="#" className={classes.title}>
-                            {this.props.pageInfo.pageTitle}
-                        </Button>
+                        <Fade in={this.state.titleChanged}>
+                            <Button href="#" className={classes.title}>
+                                {this.props.pageInfo.pageTitle}
+                            </Button>
+                        </Fade>
                     </div>
                     <Hidden mdUp>
                         <IconButton

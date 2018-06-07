@@ -18,6 +18,8 @@ import FormControl from "material-ui/Form/FormControl";
 import InputLabel from "material-ui/Input/InputLabel";
 import MenuItem from "material-ui/Menu/MenuItem";
 
+import Fade from 'material-ui/transitions/Fade';
+
 // core components
 import GridContainer from "components/Grid/GridContainer.jsx";
 import ItemGrid from "components/Grid/ItemGrid.jsx";
@@ -187,6 +189,7 @@ class Orders extends React.Component{
       let dealer = this._getSelectedDealer();
       let title = dealer ? 'Orders for ' + dealer.name : 'Orders';
     return (
+        <Fade in={true}>
       <GridContainer>
           <ItemGrid xs={12}>
               <IconCard
@@ -231,6 +234,7 @@ class Orders extends React.Component{
           />
         </ItemGrid>
       </GridContainer>
+        </Fade>
     );
   }
 
