@@ -9,6 +9,7 @@ import CardContent from "material-ui/Card/CardContent";
 import CardHeader from "material-ui/Card/CardHeader";
 import CardActions from "material-ui/Card/CardActions";
 
+import Fade from 'material-ui/transitions/Fade';
 import headerCardStyle from "assets/jss/material-dashboard-pro-react/components/headerCardStyle.jsx";
 
 function HeaderCard({ ...props }) {
@@ -35,25 +36,27 @@ function HeaderCard({ ...props }) {
       [classes[footerAlign]]: footerAlign !== undefined
     });
   return (
-    <Card className={classes.card + plainCardClasses}>
-      <CardHeader
-        classes={{
-          root:
-            classes.cardHeader +
-            " " +
-            classes[headerColor + "CardHeader"] +
-            cardPlainHeaderClasses,
-          title: classes.cardTitle,
-          subheader: classes.cardSubtitle
-        }}
-        title={cardTitle}
-        subheader={cardSubtitle}
-      />
-      <CardContent className={classes.cardContent}>{content}</CardContent>
-      {footer !== undefined ? (
-        <CardActions className={cardFooterClasses}>{footer}</CardActions>
-      ) : null}
-    </Card>
+      <Fade in={true}>
+        <Card className={classes.card + plainCardClasses}>
+          <CardHeader
+            classes={{
+              root:
+                classes.cardHeader +
+                " " +
+                classes[headerColor + "CardHeader"] +
+                cardPlainHeaderClasses,
+              title: classes.cardTitle,
+              subheader: classes.cardSubtitle
+            }}
+            title={cardTitle}
+            subheader={cardSubtitle}
+          />
+          <CardContent className={classes.cardContent}>{content}</CardContent>
+          {footer !== undefined ? (
+            <CardActions className={cardFooterClasses}>{footer}</CardActions>
+          ) : null}
+        </Card>
+      </Fade>
   );
 }
 
