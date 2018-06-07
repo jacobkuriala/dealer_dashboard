@@ -145,7 +145,7 @@ class OrderDetails extends React.Component{
         let postOrderAddonsContent = null;
         if(!isEmpty(postOrderOptions)){
             console.log(postOrderOptions);
-            let postOrderAddonsList = map(postOrderOptions,(option) => {
+            postOrderAddonsList = map(postOrderOptions,(option) => {
                 return (
                     <p key={`order-option-${get(option, 'name')}`}>
                         <small>{option.name}:</small> {PriceFormat.defaultCents(option.priceCents)}
@@ -163,17 +163,21 @@ class OrderDetails extends React.Component{
             }
         }
         if(orderDetail.optionsCostCents || postOrderAddonsList){
-            const content = orderDetail.options.map((option) => {
+            const addOnContent = orderDetail.options.map((option) => {
                 return (
                     <div key={option.optionId}>
                         <p>
                             <small>{option.option.name}:</small> {PriceFormat.defaultCents(option.priceCents)}
                         </p>
-                        {postOrderAddonsContent}
                     </div>
                 );
             });
-            return this._createCard('Addons', content);
+
+            return this._createCard('Addons', (
+                <div>
+                    {addOnContent}
+                    {postOrderAddonsContent}
+                </div>));
         }else{
             return null;
         }
