@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import * as actionCreators from '../../../store/actions/actions';
-import {forEach, toNumber, get, capitalize, isNil } from "lodash";
+import {forEach, toNumber, get, capitalize, isNil, isEmpty, map } from "lodash";
 import loading from '../../../middleware/Auth/Callback/loading.svg'
 // @material-ui/icons
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
@@ -133,17 +133,47 @@ class OrderDetails extends React.Component{
     }
 
     _getUpgradesCard(orderDetail){
-        if(orderDetail.optionsCostCents){
+        const postOrder = get(orderDetail, 'postOrder');
+        const _postOrderOptions = get(postOrder, 'postOrderOptions');
+        let postOrderOptions;
+        try {
+            postOrderOptions = _postOrderOptions && JSON.parse(_postOrderOptions);
+        } catch (error) {
+            console.log('JSON.parse failure', {error, rawData: _postOrderOptions});
+        }
+        let postOrderAddonsList = null;
+        let postOrderAddonsContent = null;
+        if(!isEmpty(postOrderOptions)){
+            console.log(postOrderOptions);
+            let postOrderAddonsList = map(postOrderOptions,(option) => {
+                return (
+                    <p key={`order-option-${get(option, 'name')}`}>
+                        <small>{option.name}:</small> {PriceFormat.defaultCents(option.priceCents)}
+                    </p>
+                )
+            });
+            if(postOrderAddonsList){
+                postOrderAddonsContent = (
+                    <div>
+                        <br />
+                        Post order Addons (not included in addons total)
+                        {postOrderAddonsList}
+                    </div>
+                )
+            }
+        }
+        if(orderDetail.optionsCostCents || postOrderAddonsList){
             const content = orderDetail.options.map((option) => {
                 return (
                     <div key={option.optionId}>
                         <p>
                             <small>{option.option.name}:</small> {PriceFormat.defaultCents(option.priceCents)}
                         </p>
+                        {postOrderAddonsContent}
                     </div>
                 );
             });
-            return this._createCard('Upgrades', content);
+            return this._createCard('Addons', content);
         }else{
             return null;
         }
@@ -371,7 +401,7 @@ class OrderDetails extends React.Component{
         return orderDetail.optionsCostCents ?
             (
                 <p>
-                    <small>AddOns Total:</small>   {PriceFormat.defaultCents(orderDetail.optionsCostCents)}
+                    <small>Addons Total:</small>   {PriceFormat.defaultCents(orderDetail.optionsCostCents)}
                 </p>
             )
             :
